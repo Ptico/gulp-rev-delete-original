@@ -1,6 +1,6 @@
 {
   "name": "@localnerve/gulp-rev-delete-original",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Delete the original file rewritten by gulp-rev.",
   "scripts": {
