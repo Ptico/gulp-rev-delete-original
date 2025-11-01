@@ -1,0 +1,6 @@
+.editorconfig
+jsconfig.json
+.eslintrc.json
+.git*
+coverage
+test

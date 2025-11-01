@@ -1,5 +1,6 @@
 MIT License
 
+Copyright (c) 2025 Alex Grant <info@localnerve.com> (https://www.localnerve.com), LocalNerve LLC
 Copyright (c) 2016 James Newell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

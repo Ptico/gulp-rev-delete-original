@@ -1,5 +1,7 @@
 # gulp-rev-delete-original
 
+> A fork of the original [nib-health-funds/gulp-rev-delete-original](https://github.com/nib-health-funds/gulp-rev-delete-original) with updated dependencies, code, and support
+
 Delete the original file rewritten by
 [gulp-rev](https://www.npmjs.com/package/gulp-rev) or
 [gulp-rev-all](https://www.npmjs.com/package/gulp-rev-all).
@@ -46,9 +48,9 @@ Function:
 
 ```js
 revdel({
-  exclude: function(file) {
+  exclude: file => {
     if (/build\.css$/.test(file.name)) {
-      return true; //if you want to exclude the file from being deleted
+      return true; // if you want to exclude the file from being deleted
     }
   }
 });

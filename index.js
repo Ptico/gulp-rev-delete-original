@@ -1,67 +1,59 @@
-var through = require('through2');
-var rimraf = require('rimraf');
+/**
+ * gulp-rev-delete-original
+ * 
+ * Copyright (c) 2025 Alex Grant <info@localnerve.com> (https://www.localnerve.com), LocalNerve LLC
+ * Licensed under the MIT license.
+ */
+import { Transform } from 'node:stream';
+import { rimraf } from 'rimraf';
 
 /**
- * Return a stream for deleting the original file
- * @param   {object}          [options]
- * @param   {RegExp|function} [options.exclude]
- * @param   {function}        [options.remove]
- * @returns {function}
+ * Return a stream for deleting the original file.
+ *
+ * @param {object} [options] - The plugin options
+ * @param {RegExp|function} [options.exclude] - Function or regex to determine file exclusion
+ * @param {AsyncFunction} [options.remove] - Async Function to remove the file
+ * @return {Stream} Transform stream
  */
-module.exports = function(options) {
-
-  var exclude = options && options.exclude || false;
-  var remove = options && options.remove || rimraf;
-
-  options = options || {};
-  return through.obj(function(file, enc, cb) {
-
-    //delete the original file
-    var del = function() {
-      if(file.revOrigPath) {
-        rimraf(file.revOrigPath, function(err) {
-          if (err) return cb(err);
-          cb(null, file);
-        });
-      } else {
-        cb(null);
-      }
-    };
-
-    //don't delete files that haven't been rewritten
-    if (file.revOrigPath === file.path) {
-      return cb(null, file);
-    }
-
-    //exclude files from being deleted
-    if (exclude) {
-
-      var
-        excluded,
-        filter = exclude
-      ;
-
-      if (typeof filter === 'function') {
-        excluded = filter(file);
-      } else if(filter instanceof RegExp) {
-        excluded = filter.test(file.path);
-      }
-
-      if (excluded) {
+export default function deleteOriginal ({
+  exclude = null,
+  remove = rimraf
+} = {}) {
+  return new Transform({
+    objectMode: true,
+    transform: async (file, encoding, cb) => {
+      // Passthru non rev
+      if (!file.revOrigPath) {
         return cb(null, file);
-      } else {
-
-        //delete the original file
-        return del();
-
       }
 
-    } else {
+      // Don't delete files that haven't been rewritten
+      if (file.revOrigPath === file.path) {
+        return cb(null, file);
+      }
 
-      //delete the original file
-      return del();
+      // Perform any exclusion
+      if (exclude) {
+        let excluded = false;
 
+        if (typeof exclude === 'function') {
+          excluded = exclude(file);
+        } else if (exclude instanceof RegExp) {
+          excluded = exclude.test(file.path);
+        }
+
+        if (excluded) {
+          return cb(null, file);
+        }
+      }
+      
+      // Remove the original file
+      try {
+        await remove(file.revOrigPath);
+        cb(null, file);
+      } catch (e) {
+        cb(e);
+      }
     }
-
   });
 };
